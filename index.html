@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAMSARA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Barlow+Condensed:wght@300;400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ed;
+      --off-white: #e8e4de;
+      --grey: #5a5a5a;
+      --grey-light: #b0aca5;
+      --accent: #c8b560;
+      --accent-dim: #8a7a3a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+      opacity: 0.5;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* GRAIN OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 60px;
+      mix-blend-mode: normal;
+    }
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.35em;
+      color: var(--white);
+      text-decoration: none;
+      position: relative;
+    }
+    .nav-links {
+      display: flex;
+      gap: 42px;
+      list-style: none;
+      position: relative;
+    }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey-light);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    #hero {
+      position: relative;
+      height: 100vh;
+      min-height: 700px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://i.postimg.cc/B8CdfLnV/97c8c25a-442e-4ee2-a9a6-fcb8e728168b.jpg');
+      background-size: cover;
+      background-position: center top;
+      filter: grayscale(40%) contrast(1.1);
+      transform: scale(1.04);
+      animation: heroZoom 18s ease-in-out infinite alternate;
+    }
+    @keyframes heroZoom {
+      from { transform: scale(1.04); }
+      to   { transform: scale(1.0); }
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,10,10,0.15) 0%,
+        rgba(10,10,10,0.1) 40%,
+        rgba(10,10,10,0.75) 75%,
+        rgba(10,10,10,1) 100%
+      );
+    }
+    .hero-content {
+      position: relative;
+      padding: 0 60px 72px;
+    }
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 400;
+      font-size: 12px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s ease forwards;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(80px, 14vw, 180px);
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      opacity: 0;
+      animation: fadeUp 1s 0.5s ease forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--off-white);
+    }
+    .hero-tagline {
+      margin-top: 28px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      color: var(--grey-light);
+      max-width: 360px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 1s 0.75s ease forwards;
+    }
+    .hero-scroll {
+      position: absolute;
+      right: 60px;
+      bottom: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: fadeIn 1s 1.2s ease forwards;
+    }
+    .hero-scroll span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      writing-mode: vertical-rl;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* SECTIONS COMMON */
+    section {
+      padding: 120px 60px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 1px;
+      background: var(--accent);
+    }
+    .section-heading {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.05;
+      color: var(--white);
+    }
+    .section-heading em {
+      font-style: italic;
+      color: var(--grey-light);
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
+    }
+
+    /* BIOGRAPHY */
+    #biografia {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .bio-image-wrap {
+      position: relative;
+    }
+    .bio-image {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      object-position: center top;
+      filter: grayscale(30%) contrast(1.05);
+      display: block;
+    }
+    .bio-image-accent {
+      position: absolute;
+      bottom: -18px;
+      right: -18px;
+      width: 80%;
+      height: 80%;
+      border: 1px solid var(--accent);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .bio-year-stamp {
+      position: absolute;
+      top: 24px;
+      left: -24px;
+      font-family: 'Playfair Display', serif;
+      font-size: 110px;
+      font-weight: 900;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(200,181,96,0.18);
+      pointer-events: none;
+    }
+    .bio-text { }
+    .bio-body {
+      margin-top: 36px;
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--grey-light);
+      font-weight: 300;
+    }
+    .bio-body p + p { margin-top: 20px; }
+    .bio-highlight {
+      margin-top: 48px;
+      padding: 28px 36px;
+      border-left: 2px solid var(--accent);
+      background: rgba(200,181,96,0.04);
+    }
+    .bio-highlight p {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 19px;
+      line-height: 1.6;
+      color: var(--off-white);
+    }
+    .bio-stat {
+      margin-top: 48px;
+      display: flex;
+      gap: 48px;
+    }
+    .stat-item { }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 42px;
+      color: var(--white);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-top: 6px;
+    }
+
+    /* SINGLE */
+    #discografia {
+      position: relative;
+    }
+    .single-layout {
+      margin-top: 64px;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 72px;
+      align-items: center;
+    }
+    .single-cover {
+      position: relative;
+      aspect-ratio: 1;
+      background: #111;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .single-cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(20%);
+      transition: transform 0.6s ease, filter 0.6s ease;
+    }
+    .single-cover:hover .single-cover-img {
+      transform: scale(1.04);
+      filter: grayscale(0%);
+    }
+    .single-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--black);
+      padding: 5px 12px;
+      font-weight: 600;
+    }
+    .single-info { }
+    .single-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(36px, 4.5vw, 58px);
+      line-height: 1;
+      color: var(--white);
+      margin-top: 16px;
+    }
+    .single-title em {
+      font-style: italic;
+      display: block;
+      color: var(--grey-light);
+    }
+    .single-meta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-top: 6px;
+    }
+    .single-desc {
+      margin-top: 28px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--grey-light);
+      max-width: 420px;
+    }
+    .stream-links {
+      margin-top: 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .stream-link {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 16px 24px;
+      border: 1px solid rgba(255,255,255,0.07);
+      text-decoration: none;
+      color: var(--grey-light);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: border-color 0.3s, color 0.3s, background 0.3s;
+      max-width: 380px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stream-link::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+      z-index: 0;
+    }
+    .stream-link:hover::before { transform: translateX(0); }
+    .stream-link:hover { color: var(--black); border-color: var(--accent); }
+    .stream-link span, .stream-icon { position: relative; z-index: 1; }
+    .stream-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* EP TEASER */
+    .ep-teaser {
+      margin-top: 80px;
+      padding: 52px;
+      border: 1px solid rgba(255,255,255,0.06);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,0.015);
+    }
+    .ep-teaser::before {
+      content: 'ARJÉ';
+      position: absolute;
+      right: -20px;
+      bottom: -30px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 140px;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(200,181,96,0.06);
+      pointer-events: none;
+    }
+    .ep-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .ep-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+    }
+    .ep-desc {
+      margin-top: 14px;
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--grey-light);
+      max-width: 500px;
+    }
+    .ep-tracks {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--grey);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .ep-tracks strong {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* GALLERY CAROUSEL */
+    #galeria {
+      max-width: 100%;
+      padding: 120px 60px;
+    }
+    .gallery-header {
+      max-width: 1300px;
+      margin: 0 auto 60px;
+    }
+    .carousel-wrap {
+      position: relative;
+      max-width: 1300px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1);
+      will-change: transform;
+    }
+    .carousel-slide {
+      min-width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .carousel-slide img {
+      width: 100%;
+      height: 68vh;
+      min-height: 420px;
+      max-height: 700px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      filter: grayscale(20%) contrast(1.05);
+      transition: filter 0.6s ease;
+    }
+    .carousel-slide.active img { filter: grayscale(0%) contrast(1.05); }
+
+    /* Counter */
+    .carousel-counter {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: var(--white);
+      background: rgba(10,10,10,0.55);
+      padding: 6px 14px;
+      backdrop-filter: blur(6px);
+    }
+    .carousel-counter span { color: var(--accent); }
+
+    /* Arrows */
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(10,10,10,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      backdrop-filter: blur(6px);
+      transition: background 0.3s, border-color 0.3s;
+      z-index: 10;
+    }
+    .carousel-btn:hover { background: var(--accent); border-color: var(--accent); color: var(--black); }
+    .carousel-btn svg { width: 20px; height: 20px; }
+    .carousel-btn.prev { left: 20px; }
+    .carousel-btn.next { right: 20px; }
+
+    /* Dots */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 28px;
+    }
+    .carousel-dot {
+      width: 28px;
+      height: 2px;
+      background: rgba(255,255,255,0.15);
+      cursor: none;
+      transition: background 0.3s, width 0.3s;
+      border: none;
+    }
+    .carousel-dot.active { background: var(--accent); width: 48px; }
+
+    /* CONTACT */
+    #contacto {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: start;
+    }
+    .contact-left { }
+    .contact-body {
+      margin-top: 32px;
+      font-size: 15px;
+      line-height: 1.85;
+      color: var(--grey-light);
+    }
+    .contact-email {
+      margin-top: 48px;
+    }
+    .contact-email-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey);
+      margin-bottom: 12px;
+    }
+    .contact-email-link {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--white);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(200,181,96,0.3);
+      padding-bottom: 4px;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .contact-email-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    .contact-right { padding-top: 80px; }
+    .rrss-heading {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+    .rrss-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .rrss-item {
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .rrss-item:last-child { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .rrss-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 0;
+      text-decoration: none;
+      color: var(--grey-light);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: color 0.3s, padding-left 0.3s;
+    }
+    .rrss-link:hover { color: var(--accent); padding-left: 8px; }
+    .rrss-arrow {
+      font-size: 18px;
+      opacity: 0.4;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .rrss-link:hover .rrss-arrow { opacity: 1; transform: translate(4px, -4px); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 48px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 100%;
+    }
+    .footer-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 0.35em;
+      color: var(--grey);
+    }
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey);
+    }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.35s; }
+    .reveal-delay-4 { transition-delay: 0.5s; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 24px 28px; }
+      .nav-links { gap: 24px; }
+      section { padding: 80px 28px; }
+      #biografia { grid-template-columns: 1fr; gap: 48px; }
+      .bio-year-stamp { display: none; }
+      .single-layout { grid-template-columns: 1fr; gap: 40px; }
+      .single-cover { max-width: 320px; }
+      #contacto { grid-template-columns: 1fr; gap: 60px; }
+      .contact-right { padding-top: 0; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .gallery-item { grid-column: unset !important; grid-row: unset !important; }
+      #galeria { padding: 80px 28px; }
+      .carousel-btn { width: 40px; height: 40px; }
+      .hero-content { padding: 0 28px 56px; }
+      .hero-scroll { right: 28px; bottom: 56px; }
+      footer { padding: 36px 28px; flex-direction: column; gap: 16px; }
+      .ep-teaser { grid-template-columns: 1fr; }
+      .ep-tracks { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">SAMSARA</a>
+    <ul class="nav-links">
+      <li><a href="#biografia">Nosotros</a></li>
+      <li><a href="#discografia">Música</a></li>
+      <li><a href="#galeria">Galería</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero" style="max-width:100%; padding:0;">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Madrid &mdash; Rock &mdash; 2024</p>
+      <h1 class="hero-title">SAM<em>SARA</em></h1>
+      <p class="hero-tagline">Cinco voces, un sonido. El rock no ha muerto — está empezando.</p>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BIOGRAPHY -->
+  <section id="biografia">
+    <div class="bio-image-wrap reveal">
+      <div class="bio-year-stamp">24</div>
+      <img class="bio-image" src="https://i.postimg.cc/svqzThMs/97a61362-3540-4cda-8a47-f43ceb98ca30.jpg" alt="Samsara" />
+      <div class="bio-image-accent"></div>
+    </div>
+    <div class="bio-text">
+      <div class="section-label reveal">Sobre nosotros</div>
+      <h2 class="section-heading reveal reveal-delay-1">Nacidos <em>del ruido,</em> forjados en directo.</h2>
+      <div class="bio-body reveal reveal-delay-2">
+        <p>Samsara nace de la amistad y de una pasión compartida que no cabe en las aulas. Cinco chavales de 17 años que decidieron que la música no era un hobby — era la dirección.</p>
+        <p>En poco tiempo han construido un directo que sorprende: explosivo, provocador y milimétricamente cuidado. Una banda que toca como si cada noche fuera la última y como si llevaran una vida en los escenarios.</p>
+        <p>Con un sold-out en la Sala Clamores ya en el bolsillo, Samsara lleva al rock clásico hacia un territorio nuevo sin perder lo que siempre lo hizo grande.</p>
+      </div>
+      <div class="bio-highlight reveal reveal-delay-3">
+        <p>"Aire fresco no significa olvidar de dónde viene el rock. Significa reinventarlo desde adentro."</p>
+      </div>
+      <div class="bio-stat reveal reveal-delay-4">
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Miembros</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">17</div>
+          <div class="stat-label">Años</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Sold-Out</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DISCOGRAPHY -->
+  <section id="discografia">
+    <div class="section-label reveal">Música</div>
+    <h2 class="section-heading reveal reveal-delay-1">Lo que <em>hemos hecho</em> sonar.</h2>
+
+    <div class="single-layout">
+      <div class="single-cover reveal">
+        <img class="single-cover-img" src="https://i.postimg.cc/LqVrFY80/aa225785-ff39-419b-9f7c-6fb1a788cc19.jpg" alt="Cayendo Por El Agujero" />
+        <div class="single-badge">Nuevo Single</div>
+      </div>
+      <div class="single-info">
+        <div class="single-meta reveal">Primer Single &mdash; 2024</div>
+        <h3 class="single-title reveal reveal-delay-1">Cayendo<em>Por El Agujero</em></h3>
+        <p class="single-desc reveal reveal-delay-2">El punto de partida. Una declaración de intenciones que combina la urgencia del rock más crudo con una producción que mira hacia adelante. Escúchala y entiende de qué va Samsara.</p>
+        <div class="stream-links reveal reveal-delay-3">
+          <a class="stream-link" href="https://open.spotify.com/intl-es/track/3It9sng8fGlzJlbntKH7s0?si=c2df90c8bdce45c0" target="_blank" rel="noopener">
+            <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+            <span>Escuchar en Spotify</span>
+          </a>
+          <a class="stream-link" href="https://music.apple.com/es/song/cayendo-por-el-agujero/6762818621" target="_blank" rel="noopener">
+            <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.994 6.124a9.23 9.23 0 00-.24-2.19c-.317-1.31-1.062-2.31-2.18-3.043a5.022 5.022 0 00-1.877-.726 10.496 10.496 0 00-1.564-.15c-.04-.003-.083-.01-.124-.013H5.986c-.152.01-.303.017-.455.026C4.786.07 4.043.15 3.34.428 2.004.958 1.04 1.88.475 3.208A7.37 7.37 0 00.05 5.8C.024 6.052.01 6.305.004 6.559V17.44c.01.15.017.302.026.453.06.863.19 1.713.5 2.526.63 1.64 1.775 2.74 3.49 3.202.58.154 1.173.22 1.768.254.5.03 1.002.043 1.504.043H17.29c.5 0 1.001-.013 1.502-.042.52-.03 1.034-.089 1.54-.229 1.738-.464 2.898-1.564 3.52-3.236.304-.81.432-1.66.492-2.52.02-.267.03-.535.033-.803V6.124h-.383zm-5.45 8.012c-.025.657-.085 1.303-.295 1.934-.43 1.296-1.382 2.01-2.748 2.096-.32.02-.64.025-.963.013-.636-.025-1.218-.195-1.72-.581-.14-.108-.297-.206-.408-.333-.023-.026-.033-.07-.025-.102.01-.043.053-.085.087-.124l.82-.963c.013-.014.034-.023.05-.034.02.013.043.023.057.038.168.183.348.355.566.48.45.258.94.327 1.45.29.564-.04.943-.32 1.12-.846.12-.36.137-.728.14-1.1V9.84h-3.11v-.004h-1.278V8.54h4.388v.003h.604l.014 5.593zm-8.2-6.022l-4.21 6.55h4.21v1.29H4.002v-1.287l4.213-6.553H4.09V6.821h6.254v1.293z"/></svg>
+            <span>Escuchar en Apple Music</span>
+          </a>
+          <a class="stream-link" href="https://amazon.es/music/player/tracks/B0GY1C8RVT?marketplaceId=A1RKKUPIHCS9HS&musicTerritory=ES&ref=dm_sh_gjJCrZrXCFeoI3NJtX19HZbCB" target="_blank" rel="noopener">
+            <svg class="stream-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.525.13.12.174.09.336-.12.48l-.232.174a19.44 19.44 0 01-.735.468c-2.67 1.564-5.592 2.35-8.76 2.35-4.044 0-7.78-1.02-11.21-3.06a1.065 1.065 0 01-.27-.222.48.48 0 01-.069-.36c.022-.107.067-.19.138-.238zm7.99-9.723c0-1.96.638-3.503 1.913-4.63 1.274-1.126 2.94-1.688 4.996-1.688.45 0 .896.026 1.337.077.44.05.869.126 1.286.226l.424.104v-1.4c0-.572.063-1.04.188-1.403.13-.365.36-.638.7-.82.342-.183.792-.274 1.35-.274.328 0 .652.044.974.133V7.19l-1.23.035c-.617.017-1.054.09-1.314.22-.26.128-.393.333-.393.615v.466c.582.308 1.088.67 1.516 1.086.43.413.756.886.978 1.418.22.53.33 1.113.33 1.745 0 1.22-.34 2.252-1.022 3.096-.682.843-1.585 1.422-2.707 1.736l1.637 2.095c.084.106.064.224-.062.354-.124.13-.28.195-.467.195-.083 0-.167-.02-.25-.063l-2.614-2.063c-.315.024-.631.036-.952.036-.698 0-1.354-.073-1.97-.22l-2.39 2.247c-.083.08-.19.12-.32.12-.198 0-.375-.07-.526-.21-.15-.14-.194-.288-.13-.443l1.48-2.11c-.97-.41-1.72-1.02-2.25-1.84-.532-.822-.797-1.77-.797-2.844zm3.27 0c0 .854.214 1.539.643 2.055.428.515 1.016.773 1.763.773.74 0 1.328-.258 1.762-.773.435-.516.652-1.2.652-2.055 0-.87-.217-1.56-.652-2.07-.434-.508-1.022-.762-1.762-.762-.747 0-1.335.254-1.763.762-.43.51-.644 1.2-.644 2.07z"/></svg>
+            <span>Escuchar en Amazon Music</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EP TEASER -->
+    <div class="ep-teaser reveal">
+      <div>
+        <div class="ep-label">Próximamente</div>
+        <div class="ep-title">ARJÉ</div>
+        <p class="ep-desc">El primer proyecto de Samsara. Un EP de seis canciones que plantea el inicio de una carrera, una vuelta al rock de siempre y la declaración de una identidad sonora propia. El origen de todo.</p>
+      </div>
+      <div class="ep-tracks">
+        <strong>6</strong>
+        Tracks
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- GALLERY -->
+  <section id="galeria" style="max-width:100%; padding:120px 60px;">
+    <div class="gallery-header">
+      <div class="section-label reveal">Galería</div>
+      <h2 class="section-heading reveal reveal-delay-1">El directo <em>no se describe,</em> se siente.</h2>
+    </div>
+    <div class="carousel-wrap reveal reveal-delay-2">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-slide active">
+          <img src="https://i.postimg.cc/r0F7VVDG/c0ec3872-776c-4898-a1ea-8a598a82c2e2.jpg" alt="Samsara en directo" />
+        </div>
+        <div class="carousel-slide">
+          <img src="https://i.postimg.cc/ZvWgNwFy/IMG-4585.avif" alt="Samsara" />
+        </div>
+        <div class="carousel-slide">
+          <img src="https://i.postimg.cc/QKFP7fkg/IMG-4591.avif" alt="Samsara" />
+        </div>
+        <div class="carousel-slide">
+          <img src="https://i.postimg.cc/svqzThMs/97a61362-3540-4cda-8a47-f43ceb98ca30.jpg" alt="Samsara" />
+        </div>
+        <div class="carousel-slide">
+          <img src="https://i.postimg.cc/B8CdfLnV/97c8c25a-442e-4ee2-a9a6-fcb8e728168b.jpg" alt="Samsara" />
+        </div>
+        <div class="carousel-slide">
+          <img src="https://i.postimg.cc/LqVrFY80/aa225785-ff39-419b-9f7c-6fb1a788cc19.jpg" alt="Samsara" />
+        </div>
+      </div>
+      <div class="carousel-counter"><span id="carouselCurrent">1</span> / 6</div>
+      <button class="carousel-btn prev" id="carouselPrev" aria-label="Anterior">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="carousel-btn next" id="carouselNext" aria-label="Siguiente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="carousel-dots" id="carouselDots">
+      <button class="carousel-dot active"></button>
+      <button class="carousel-dot"></button>
+      <button class="carousel-dot"></button>
+      <button class="carousel-dot"></button>
+      <button class="carousel-dot"></button>
+      <button class="carousel-dot"></button>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contacto">
+    <div class="contact-left">
+      <div class="section-label reveal">Contacto</div>
+      <h2 class="section-heading reveal reveal-delay-1">Hablemos <em>de lo que viene.</em></h2>
+      <p class="contact-body reveal reveal-delay-2">Si quieres contratar a Samsara para un concierto, festival o colaboración, escríbenos. Respondemos a todo — somos cinco chavales con mucho directo y ningún agente de por medio.</p>
+      <div class="contact-email reveal reveal-delay-3">
+        <div class="contact-email-label">Email de contacto & booking</div>
+        <a class="contact-email-link" href="mailto:samsaraa.music@gmail.com">samsaraa.music@gmail.com</a>
+      </div>
+    </div>
+    <div class="contact-right">
+      <div class="rrss-heading reveal">Síguenos</div>
+      <ul class="rrss-list">
+        <li class="rrss-item reveal reveal-delay-1">
+          <a class="rrss-link" href="https://www.instagram.com/samsaraamusic" target="_blank" rel="noopener">
+            <span>Instagram</span>
+            <span class="rrss-arrow">↗</span>
+          </a>
+        </li>
+        <li class="rrss-item reveal reveal-delay-2">
+          <a class="rrss-link" href="https://open.spotify.com/intl-es/track/3It9sng8fGlzJlbntKH7s0" target="_blank" rel="noopener">
+            <span>Spotify</span>
+            <span class="rrss-arrow">↗</span>
+          </a>
+        </li>
+        <li class="rrss-item reveal reveal-delay-3">
+          <a class="rrss-link" href="https://music.apple.com/es/song/cayendo-por-el-agujero/6762818621" target="_blank" rel="noopener">
+            <span>Apple Music</span>
+            <span class="rrss-arrow">↗</span>
+          </a>
+        </li>
+        <li class="rrss-item reveal reveal-delay-4">
+          <a class="rrss-link" href="https://amazon.es/music/player/tracks/B0GY1C8RVT?marketplaceId=A1RKKUPIHCS9HS&musicTerritory=ES" target="_blank" rel="noopener">
+            <span>Amazon Music</span>
+            <span class="rrss-arrow">↗</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">SAMSARA</div>
+    <div class="footer-copy">&copy; 2024 Samsara &mdash; Todos los derechos reservados</div>
+  </footer>
+
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animateCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; cursorRing.style.width = '54px'; cursorRing.style.height = '54px'; });
+      el.addEventListener('mouseleave', () => { cursor.style.width = '10px'; cursor.style.height = '10px'; cursorRing.style.width = '36px'; cursorRing.style.height = '36px'; });
+    });
+
+    // CAROUSEL
+    const track = document.getElementById('carouselTrack');
+    const slides = track.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const counterEl = document.getElementById('carouselCurrent');
+    let current = 0;
+    const total = slides.length;
+    let autoTimer;
+
+    function goTo(idx) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (idx + total) % total;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      track.style.transform = `translateX(-${current * 100}%)`;
+      counterEl.textContent = current + 1;
+    }
+    document.getElementById('carouselNext').addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+    document.getElementById('carouselPrev').addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+    dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); resetAuto(); }));
+
+    // Swipe support
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) { goTo(diff > 0 ? current + 1 : current - 1); resetAuto(); }
+    });
+
+    function resetAuto() { clearInterval(autoTimer); autoTimer = setInterval(() => goTo(current + 1), 5000); }
+    resetAuto();
+
+    // SCROLL REVEAL
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => observer.observe(r));
+  </script>
+</body>
+</html>
